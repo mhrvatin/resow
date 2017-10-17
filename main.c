@@ -13,6 +13,7 @@ int maxvalue(int *dataset, int datasize);
 int minvalue(int* dataset, int datasize);
 void selectionSort(int arr[], int n);
 float generateRandom(int rmax);
+int writeDataset(char* outputfileName, int datasetSize, int* sortedDataset, int* avg, int* min, int* max);
 
 int main(int argc, char* argv[]) {
     srand((unsigned int) time(NULL));
@@ -33,14 +34,10 @@ int main(int argc, char* argv[]) {
 	
     loadDataset(dataset, fileName, datasetSize);
 
+    // sort the dataset and copy it into the memory area pointed by sds
+    //sortedDataset = sortDataset(ds,sortingAlgorithm);
 	selectionSort(dataset, datasetSize);
    
-    // debug, printing to make sure it's all there
-    for (int i = 0; i < datasetSize; i++) {
-        //printf("dataset: %d\n", dataset[i]);
-        printf("rand: %f\n", generateRandom(123));
-    }
-
     // compute the average value of the dataset, i.e. sum_of_dataset_values / num_of_dataset_values
 	avg = average(dataset, datasetSize);
     printf("average: %lf \n", avg);
@@ -52,11 +49,10 @@ int main(int argc, char* argv[]) {
 	min = minvalue(dataset, datasetSize);
     printf("min: %d \n", min);
 
-    // sort the dataset and copy it into the memory area pointed by sds
-    //sds = sortDataset(ds,sortingAlgorithm);
-    // write the sorted array into a new file plus the valies of the average, min and max as the first three records.
-    //writeDataset(OutputFilename,sds,Buffersize, avg, min, max)
-    
+    // write the sorted array into a new file plus the values of the average, min and max as the first three records.
+    writeDataset(OutputFilename,sds,Buffersize, avg, min, max);
+    writeDataset(outputFileName, datasetSize, sortedDataset, &avg, &min, &max);
+       
 	free(fileName);
 
     return 0;
@@ -137,4 +133,25 @@ void selectionSort(int arr[], int n) {
 
 float generateRandom(int rmax) {
     return ((float) rand() / (float)(RAND_MAX) * rmax);
+}
+
+int writeDataset(char* fileName, int datasetSize, int* sortedDataset, int* avg, int* min, int* max) {
+    int i = 0;
+    FILE* file;
+
+    file = fopen(filename, "w");
+
+    if (file) {
+        fwrite(avg, 1, sizeof(float), file);
+        fwrite(min, 1, sizeof(float), file);
+        fwrite(max, 1, sizeof(float), file);
+
+        for (i = 1; i <= datasetSize, i++) {
+            fwrite(sortedDataset[i], 1, sizeof(float), file);
+        }
+
+        fclose(file);
+    }
+
+    return 0;
 }
