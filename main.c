@@ -25,18 +25,16 @@ int main(int argc, char* argv[]) {
 
     int dataset[datasetSize];
 	memset(dataset,0, datasetSize*sizeof(int));
-
-    
 	
     loadDataset(dataset, fileName, datasetSize);
 
+	selectionSort(dataset, datasetSize);
+   
     // debug, printing to make sure it's all there
     for (int i = 0; i < datasetSize; i++) {
-        printf("%d ", dataset[i]);
+        printf("%d\n", dataset[i]);
     }
 
-	
-   
     // compute the average value of the dataset, i.e. sum_of_dataset_values / num_of_dataset_values
 	avg = average(dataset, datasetSize);
     printf("average: %lf \n", avg);
@@ -79,12 +77,12 @@ void loadDataset(int* dataset, char* fileName, int datasetSize) {
 
 double average(int* dataset, int datasize){
 	double value = 0;
-	printf("\n%d \n", datasize);
+	//printf("\n%d \n", datasize);
 
 	for(int i = 0; i < datasize; i++) {
 		value += dataset[i];
 	}
-	printf("%lf \n", value);
+	//printf("%lf \n", value);
 	return value/datasize;
 }
 
@@ -108,8 +106,9 @@ int minvalue(int* dataset, int datasize){
 	return value;
 }
 
-/*void swap(int* xp, int* yp) {
+void swap(int* xp, int* yp) {
     int temp = *xp;
+    
     *xp = *yp;
     *yp = temp;
 }
@@ -126,6 +125,6 @@ void selectionSort(int arr[], int n) {
             }
         }
 
-        swap(&arr[min_idx], %arr[i]);
+        swap(&arr[min_idx], &arr[i]);
     }
-}*/
+}
