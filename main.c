@@ -5,12 +5,17 @@
 #include <ctype.h>  // isspace()
 #include <stdlib.h>  
 #include <string.h>  
+#include <time.h>
 
 void loadDataset(int *dataset, char *fileName, int datasetSize);
 double average(int *dataset, int datasize);
 int maxvalue(int *dataset, int datasize);
+int minvalue(int* dataset, int datasize);
+void selectionSort(int arr[], int n);
+float generateRandom(int rmax);
 
 int main(int argc, char* argv[]) {
+    srand((unsigned int) time(NULL));
 	char* fileName;
 	double avg;
 	int min;
@@ -32,7 +37,8 @@ int main(int argc, char* argv[]) {
    
     // debug, printing to make sure it's all there
     for (int i = 0; i < datasetSize; i++) {
-        printf("%d\n", dataset[i]);
+        //printf("dataset: %d\n", dataset[i]);
+        printf("rand: %f\n", generateRandom(123));
     }
 
     // compute the average value of the dataset, i.e. sum_of_dataset_values / num_of_dataset_values
@@ -127,4 +133,8 @@ void selectionSort(int arr[], int n) {
 
         swap(&arr[min_idx], &arr[i]);
     }
+}
+
+float generateRandom(int rmax) {
+    return ((float) rand() / (float)(RAND_MAX) * rmax);
 }
