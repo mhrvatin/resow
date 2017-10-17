@@ -5,14 +5,18 @@
 #include <ctype.h>  // isspace()
 #include <stdlib.h>  
 #include <string.h>  
+#include <time.h>
 
 void loadDataset(int *dataset, char *fileName, int datasetSize);
 float average(float *dataset, int datasize);
 float maxvalue(float *dataset, int datasize);
 float minvalue(float *dataset, int datasize);
 void createDataset(int datasize, char *fileName);
+void selectionSort(int arr[], int n);
+float generateRandom(int rmax);
 
 int main(int argc, char* argv[]) {
+    srand((unsigned int) time(NULL));
 	char* fileName;
 	double avg;
 	float min;
@@ -28,12 +32,13 @@ int main(int argc, char* argv[]) {
 
     	float dataset[datasetSize];
 	memset(dataset,0, datasetSize*sizeof(int));
-
     
     createDataset(datasetSize, fileName);
 	
     _loadDataset(dataset, datasetSize, fileName);
 
+	selectionSort(dataset, datasetSize);
+   
     // debug, printing to make sure it's all there
    
     // compute the average value of the dataset, i.e. sum_of_dataset_values / num_of_dataset_values
@@ -57,26 +62,6 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-
-void loadDataset(int* dataset, char* fileName, int datasetSize) {
-    int c, idx = 0;
-    FILE* file;
-    
-    file = fopen(fileName, "r");
-
-    if (file) {
-        while ((c = getc(file)) != EOF) {
-            if (isspace(c) == 0) {  // discard whitespace
-                dataset[idx] = atoi(&c);
-                idx++;
-                //putchar(c);
-            }
-        }
-
-        fclose(file);
-    }
-}
-
 void _loadDataset(float* v, int datasize, char *fileName) {
 
 	FILE* f;
@@ -89,7 +74,6 @@ void _loadDataset(float* v, int datasize, char *fileName) {
 
 float average(float* dataset, int datasize){
 	float value = 0;
-
 	for(int i = 0; i < datasize; i++) {
 		value += dataset[i];
 	}
@@ -117,13 +101,12 @@ float minvalue(float* dataset, int datasize){
 	return value;
 }
 
-
 void createDataset(int datasize, char *fileName){
 
 	float v[datasize];
 	
 	for(int i = 0; i < datasize; i++){
-		v[i] = rand() % 100;
+		v[i] = generateRandom(999);
 	}
 
 	FILE *f = fopen(fileName, "w");
@@ -133,8 +116,10 @@ void createDataset(int datasize, char *fileName){
 	}
 	fclose(f);
 }
-/*void swap(int* xp, int* yp) {
+
+void swap(int* xp, int* yp) {
     int temp = *xp;
+    
     *xp = *yp;
     *yp = temp;
 }
@@ -151,6 +136,11 @@ void selectionSort(int arr[], int n) {
             }
         }
 
-        swap(&arr[min_idx], %arr[i]);
+        swap(&arr[min_idx], &arr[i]);
     }
-}*/
+}
+
+
+float generateRandom(int rmax) {
+    return ((float) rand() / (float)(RAND_MAX) * rmax);
+}
