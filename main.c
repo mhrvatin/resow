@@ -12,7 +12,8 @@ float average(float *dataset, int datasize);
 float maxvalue(float *dataset, int datasize);
 float minvalue(float *dataset, int datasize);
 void createDataset(int datasize, char *fileName);
-float* selectionSort(float* arr, int datasetSize);
+float* selectionSort(float* dataset, int datasetSize);
+float* sortData(float* dataset, int datasetSize, char* sortingAlgorithm);
 float generateRandom(int rmax);
 int writeDataset(char* fileName, int datasetSize, float* sortedDataset, float avg, float min, float max);
 
@@ -50,7 +51,8 @@ int main(int argc, char* argv[]) {
 
     // write the sorted array into a new file plus the values of the average, min and max as the first three records.
     // sort the dataset and copy it into the memory area pointed by sds
-	sortedDataset = selectionSort(dataset, datasetSize);
+    sortedDataset = sortData(dataset, datasetSize, "quicksort");
+	//sortedDataset = selectionSort(dataset, datasetSize);
     //writeDataset(OutputFilename,sds,Buffersize, avg, min, max);
     writeDataset("outputFile", datasetSize, sortedDataset, avg, min, max);
        
@@ -114,6 +116,25 @@ void createDataset(int datasize, char *fileName){
 	fclose(f);
 }
 
+int cmpfunc(const void *first, const void *second) {
+    return (*(int *) first - *(int *) second);
+}
+
+float* sortData(float* dataset, int datasetSize, char* sortingAlgorithm) {
+    float* ret;
+
+    if (strcmp(sortingAlgorithm, "quicksort") == 0) {
+        puts("quicksort selected");
+        qsort(dataset, datasetSize, sizeof(float), cmpfunc);
+        ret = dataset;
+    } else if(strcmp(sortingAlgorithm, "selectionsort") == 0 ) {
+        puts("selectionsort selected");
+        ret = selectionSort(dataset, datasetSize);
+    }
+
+    return ret;
+}
+
 void swap(float* xp, float* yp) {
     float temp = *xp;
     
@@ -121,22 +142,22 @@ void swap(float* xp, float* yp) {
     *yp = temp;
 }
 
-float* selectionSort(float* arr, int datasetSize) {
+float* selectionSort(float* dataset, int datasetSize) {
     int i, j, min_idx;
 
     for (int i = 0; i < datasetSize - 1; i++) {
         min_idx = i;
 
         for (j = i + 1; j < datasetSize; j++) {
-            if (arr[j] < arr[min_idx]) {
+            if (dataset[j] < dataset[min_idx]) {
                 min_idx = j;
             }
         }
 
-        swap(&arr[min_idx], &arr[i]);
+        swap(&dataset[min_idx], &dataset[i]);
     }
 
-    return arr;
+    return dataset;
 }
 
 
