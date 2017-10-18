@@ -25,40 +25,36 @@ int main(int argc, char* argv[]) {
 	float sds;
     float* sortedDataset;
 
-	size_t filenameSize = (strlen(argv[1]) + 1)*sizeof(char);
-	fileName = malloc(filenameSize);
-	strncpy(fileName, argv[1], filenameSize);
+	//size_t filenameSize = (strlen(argv[1]) + 1)*sizeof(char);
+	//fileName = malloc(filenameSize);
+	//strncpy(fileName, argv[1], filenameSize);
 
-    int datasetSize = (atoi(argv[2]));
-
+    int datasetSize = 102400;
 
     float dataset[datasetSize];
-	memset(dataset,0, datasetSize*sizeof(int));
+	//memset(dataset,0, datasetSize*sizeof(int));
     
-    createDataset(datasetSize, fileName);
+    //createDataset(datasetSize, fileName);
 	
-    loadDataset(dataset, datasetSize, fileName);
+    loadDataset(dataset, datasetSize, "dataset");
 
-    // sort the dataset and copy it into the memory area pointed by sds
-	sortedDataset = selectionSort(dataset, datasetSize);
 
     // compute the average value of the dataset, i.e. sum_of_dataset_values / num_of_dataset_values
 	avg = average(dataset, datasetSize);
-    printf("average: %lf \n", avg);
 	
     // find the max value in the dataset
 	max = maxvalue(dataset, datasetSize);
-    printf("max: %lf \n", max);
 	
     // find the min value in the dataset
 	min = minvalue(dataset, datasetSize);
-    printf("min: %lf \n", min);
 
     // write the sorted array into a new file plus the values of the average, min and max as the first three records.
+    // sort the dataset and copy it into the memory area pointed by sds
+	sortedDataset = selectionSort(dataset, datasetSize);
     //writeDataset(OutputFilename,sds,Buffersize, avg, min, max);
     writeDataset("outputFile", datasetSize, sortedDataset, avg, min, max);
        
-	free(fileName);
+	//free(fileName);
 
     return 0;
 }
@@ -155,12 +151,12 @@ int writeDataset(char* fileName, int datasetSize, float* sortedDataset, float av
     file = fopen(fileName, "w");
 
     if (file) {
-        fprintf(file, "avg: %lf\n", 1, avg);
-        fprintf(file, "min: %lf\n", 1, min);
-        fprintf(file, "max: %lf\n\n", 1, max);
+        fprintf(file, "avg: %f\n", 1, avg);
+        fprintf(file, "min: %f\n", 1, min);
+        fprintf(file, "max: %f\n\n", 1, max);
 
         for (i = 0; i < datasetSize; i++) {
-            fprintf(file, "%lf\n", 1, sortedDataset[i]);
+            fprintf(file, "%f\n", 1, sortedDataset[i]);
         }
 
         fclose(file);
