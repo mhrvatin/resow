@@ -164,7 +164,7 @@ int writeDataset(char* fileName, int datasetSize, float* sortedDataset, float av
 
 		setvbuf(file, sortedDataset, _IOFBF, buffsize);
         for (i = 0; i < datasetSize; i++) {
-            fprintf(file, "%f\n", sortedDataset);
+            fprintf(file, "%f\n",buffsize , sortedDataset[i]);
         }
 
         fclose(file);
