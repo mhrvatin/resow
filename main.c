@@ -7,15 +7,17 @@
 #include <string.h>  
 #include <time.h>
 
-void loadDataset(float* v, int datasize, char *fileName);
+void loadDataset(float* v, int datasize, char *fileName, int buffsize);
 float average(float *dataset, int datasize);
 float maxvalue(float *dataset, int datasize);
 float minvalue(float *dataset, int datasize);
+int cmpfunc(const void *first, const void *second);
 void createDataset(int datasize, char *fileName);
 float* selectionSort(float* dataset, int datasetSize);
 float* sortData(float* dataset, int datasetSize, char* sortingAlgorithm);
 float generateRandom(int rmax);
-int writeDataset(char* fileName, int datasetSize, float* sortedDataset, float avg, float min, float max);
+int writeDataset(char* fileName, int datasetSize, float* sortedDataset, float avg, float min, float max, int buffsize);
+
 
 int main(int argc, char* argv[]) {
     srand((unsigned int) time(NULL));
@@ -26,18 +28,16 @@ int main(int argc, char* argv[]) {
 	float sds;
     float* sortedDataset;
 
-	//size_t filenameSize = (strlen(argv[1]) + 1)*sizeof(char);
-	//fileName = malloc(filenameSize);
-	//strncpy(fileName, argv[1], filenameSize);
+	fileName = "dataset";
 
-    int datasetSize = 102400;
+    size_t datasetSize = atoi(argv[1]);
+	int buffsize = atoi(argv[2]);
 
-    float dataset[datasetSize];
-	//memset(dataset,0, datasetSize*sizeof(int));
-    
-    //createDataset(datasetSize, fileName);
-	
-    loadDataset(dataset, datasetSize, "dataset");
+
+	size_t dataset_size = (datasetSize)*sizeof(float);
+	float *dataset = malloc(dataset_size);
+		
+    loadDataset(dataset, datasetSize, fileName, buffsize);
 
 
     // compute the average value of the dataset, i.e. sum_of_dataset_values / num_of_dataset_values
@@ -52,24 +52,28 @@ int main(int argc, char* argv[]) {
     // write the sorted array into a new file plus the values of the average, min and max as the first three records.
     // sort the dataset and copy it into the memory area pointed by sds
     sortedDataset = sortData(dataset, datasetSize, "quicksort");
-	//sortedDataset = selectionSort(dataset, datasetSize);
+	// sortedDataset = selectionSort(dataset, datasetSize);
     //writeDataset(OutputFilename,sds,Buffersize, avg, min, max);
-    writeDataset("outputFile", datasetSize, sortedDataset, avg, min, max);
-       
-	//free(fileName);
+    writeDataset("outputFile", datasetSize, sortedDataset, avg, min, max, buffsize);
+	
+	free(dataset);
 
     return 0;
 }
 
-void loadDataset(float* v, int datasize, char *fileName) {
+void loadDataset(float* v, int datasize, char *fileName, int buffsize) {
 
 	FILE* f;
 	f = fopen(fileName, "r");
-	for(int i = 0; i < datasize; i++) {
-		fread(&v[i], sizeof(float), 1, f);
+	if(f != NULL){
+		for(int i = 0; i < datasize; i+= buffsize) {
+			fread(&v[i], sizeof(float), buffsize, f);
 	}
 	fclose(f);
 }
+	
+	
+	}
 
 float average(float* dataset, int datasize){
 	float value = 0;
@@ -98,22 +102,6 @@ float minvalue(float* dataset, int datasize){
 			value = dataset[i];
 	}
 	return value;
-}
-
-void createDataset(int datasize, char *fileName){
-
-	float v[datasize];
-	
-	for(int i = 0; i < datasize; i++){
-		v[i] = generateRandom(999);
-	}
-
-	FILE *f = fopen(fileName, "w");
-	for(int i = 0; i < datasize; i++) {
-		float value = v[i];
-		fwrite(&value, sizeof(float), 1, f);
-	}
-	fclose(f);
 }
 
 int cmpfunc(const void *first, const void *second) {
@@ -161,11 +149,9 @@ float* selectionSort(float* dataset, int datasetSize) {
 }
 
 
-float generateRandom(int rmax) {
-    return ((float) rand() / (float)(RAND_MAX) * rmax);
-}
 
-int writeDataset(char* fileName, int datasetSize, float* sortedDataset, float avg, float min, float max) {
+
+int writeDataset(char* fileName, int datasetSize, float* sortedDataset, float avg, float min, float max, int buffsize) {
     int i = 0;
     FILE* file;
 
@@ -176,8 +162,9 @@ int writeDataset(char* fileName, int datasetSize, float* sortedDataset, float av
         fprintf(file, "min: %f\n", 1, min);
         fprintf(file, "max: %f\n\n", 1, max);
 
+		setvbuf(file, sortedDataset, _IOFBF, buffsize);
         for (i = 0; i < datasetSize; i++) {
-            fprintf(file, "%f\n", 1, sortedDataset[i]);
+            fprintf(file, "%f\n", sortedDataset);
         }
 
         fclose(file);
