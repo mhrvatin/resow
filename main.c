@@ -40,20 +40,20 @@ int main(int argc, char* argv[]) {
     loadDataset(dataset, datasetSize, fileName, buffsize);
 
 
-    // compute the average value of the dataset, i.e. sum_of_dataset_values / num_of_dataset_values
-	avg = average(dataset, datasetSize);
-	
-    // find the max value in the dataset
-	max = maxvalue(dataset, datasetSize);
-	
-    // find the min value in the dataset
-	min = minvalue(dataset, datasetSize);
-
     // write the sorted array into a new file plus the values of the average, min and max as the first three records.
     // sort the dataset and copy it into the memory area pointed by sds
     sortedDataset = sortData(dataset, datasetSize, "quicksort");
 	// sortedDataset = selectionSort(dataset, datasetSize);
     //writeDataset(OutputFilename,sds,Buffersize, avg, min, max);
+    // compute the average value of the dataset, i.e. sum_of_dataset_values / num_of_dataset_values
+	avg = average(dataset, datasetSize);
+	
+    // find the max value in the dataset
+	max = sortedDataset[datasetSize -1];
+	
+    // find the min value in the dataset
+	min = sortedDataset[0];
+
     writeDataset("outputFile", datasetSize, sortedDataset, avg, min, max, buffsize);
 	
 	free(dataset);
@@ -112,11 +112,9 @@ float* sortData(float* dataset, int datasetSize, char* sortingAlgorithm) {
     float* ret;
 
     if (strcmp(sortingAlgorithm, "quicksort") == 0) {
-        puts("quicksort selected");
         qsort(dataset, datasetSize, sizeof(float), cmpfunc);
         ret = dataset;
     } else if(strcmp(sortingAlgorithm, "selectionsort") == 0 ) {
-        puts("selectionsort selected");
         ret = selectionSort(dataset, datasetSize);
     }
 
@@ -158,14 +156,12 @@ int writeDataset(char* fileName, int datasetSize, float* sortedDataset, float av
     file = fopen(fileName, "w");
 
     if (file) {
-        fprintf(file, "avg: %f\n", 1, avg);
-        fprintf(file, "min: %f\n", 1, min);
-        fprintf(file, "max: %f\n\n", 1, max);
+        fwrite(&avg, 4, sizeof(avg), file);
+        fwrite(&min, 4, sizeof(min), file);
+        fwrite(&max, 4, sizeof(max), file);
 
-		setvbuf(file, sortedDataset, _IOFBF, buffsize);
-        for (i = 0; i < datasetSize; i++) {
-            fprintf(file, "%f\n",buffsize , sortedDataset[i]);
-        }
+		for(int i = 0; i < datasetSize; i+= buffsize) 
+			fwrite(&sortedDataset[i], buffsize,sizeof(sortedDataset), file);
 
         fclose(file);
     }
